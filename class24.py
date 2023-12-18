@@ -7,9 +7,9 @@ import undetected_chromedriver as uc
 
 #------------------INIT--------------------#
 
-# with open('output/output.csv', 'w') as f:
-#     writer = csv.writer(f)
-#     writer.writerow(['Email'])
+with open('output.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f)
+    writer.writerow(['Product Title', 'Product URL', 'Data-ASIN','Price','In Stock','Brand Name','Rating','Details',"Shipment"])
 
 #--------------------------------# 
 # ----- - - --  --- BOT ------------------- #
@@ -77,10 +77,16 @@ for x in range(50):
             brand_bio_link = ''
             brand_name= ''
         
+        try:
+            shipment = driver.find_element(By.XPATH,"(//div[@class='offer-display-feature-text']//span)[1]").text
+        except: shipment = ''
+
         detail_list = wait.until(EC.presence_of_all_elements_located((By.XPATH,"//div[@id='feature-bullets']//ul//li")))
         description = []
+        y = 0
         for x in range(len(detail_list)):
-            detail = driver.find_element(By.XPATH,f"(//div[@id='feature-bullets']//ul//li//span)[{x}]").text
+            y += 1 
+            detail = driver.find_element(By.XPATH,f"(//div[@id='feature-bullets']//ul//li//span)[{y}]").text
             description.append(str(detail)+' ')
         description = str(description).replace(',','').replace('[','').replace(']','')
         print(f"[+] Title : ", title)
@@ -90,7 +96,11 @@ for x in range(50):
         print(f"[+] In Stock : {in_stock}")
         print(f"[+] Brand Name : {brand_name}")
         print(f"[+] Rating : {rating}")
+        print(f"[+] Shipment : {shipment}")
         print(f"[+] Description : {description}")
+        with open('output.csv', 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow([title, product_url, data_asin, price, in_stock, brand_name, rating, description, shipment])
         driver.close()
         driver.switch_to.window(driver.window_handles[0])
         time.sleep(1) 
